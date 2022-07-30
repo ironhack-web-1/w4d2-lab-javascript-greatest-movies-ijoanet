@@ -29,29 +29,18 @@ function getAllDirectors(moviesArray) {
 
 // Iteration 2: Steven Spielberg. The best? - How many drama movies did STEVEN SPIELBERG direct?
 function howManyMovies(moviesArray) {
-    return moviesArray
-        .filter(movie => movie.director === 'Steven Spielberg' && movie.genre.filter(gnr => gnr == 'Drama').length
-        ).length
+    return moviesArray.filter(movie => movie.director === 'Steven Spielberg' && movie.genre.filter(gnr => gnr == 'Drama').length).length
 }
 
 // Iteration 3: All scores average - Get the average of all scores with 2 decimals
 function scoresAverage(moviesArray) {
-    return moviesArray.length ? parseFloat(
-        (
-            moviesArray.map(movie => movie.score).filter(Number).reduce((a, b) => a + b) / moviesArray.length
-        ).toFixed(2)
-    ) : 0
+    return moviesArray.length ? parseFloat((moviesArray.map(movie => movie.score).filter(Number).reduce((a, b) => a + b) / moviesArray.length).toFixed(2)) : 0
 }
 
 // Iteration 4: Drama movies - Get the average of Drama Movies
 function dramaMoviesScore(moviesArray) {
-    dramaMovies = moviesArray.filter(movie => movie.genre.filter(gnr => gnr == 'Drama').length)
-    return dramaMovies.length ? parseFloat(
-        (
-            dramaMovies.map(movie => movie.score).filter(Number)
-                .reduce((a, b) => a + b) / dramaMovies.length
-        ).toFixed(2)
-    ) : 0
+    const dramaMovies = moviesArray.filter(movie => movie.genre.filter(gnr => gnr == 'Drama').length)
+    return dramaMovies.length ? parseFloat((dramaMovies.map(movie => movie.score).filter(Number).reduce((a, b) => a + b) / dramaMovies.length).toFixed(2)) : 0
 }
 
 // Iteration 5: Ordering by year - Order by year, ascending (in growing order)
@@ -78,11 +67,35 @@ function orderAlphabetically(moviesArray) {
 function turnHoursToMinutes(moviesArray) {
     return moviesArray.map(movie => {
         mov = { ...movie }
-        mov.duration = mov.duration.match(/\d+/g)
+        mov.duration = mov.duration.match(/\d+/g) // For the exercise words, but, if the duration is given in minutes only, will be incorrect!
         mov.duration = Number(mov.duration[0]) * 60 + (Number(mov.duration[1] || 0))
         return mov
     })
 }
 
-// BONUS - Iteration 8: Best yearly score average - Best yearly score average
-function bestYearAvg(moviesArray) { }
+function bestYearAvg(moviesArray) {
+    if (!moviesArray.length) {
+        return null
+    }
+    const moviesByYear = {}
+    moviesArray.map(
+        movie => {
+            return { year: movie.year, score: movie.score }
+        })
+        // Group by year
+        .forEach(movie => {
+            if (!moviesByYear[movie.year]) moviesByYear[movie.year] = []
+            moviesByYear[movie.year].push(movie)
+        })
+    const avgMoviesByYear = []
+    for (let entry of Object.entries(moviesByYear)) {
+        if (entry[1].length === 1) {
+            avgMoviesByYear.push(entry[1][0])
+            continue
+        }
+        avgMoviesByYear.push({year: Number(entry[0]), score: entry[1].map(e => e.score).reduce((a,b) => a + b) / entry[1].length})
+    }
+    avgMoviesByYear.sort((a, b) => b.score - a.score)
+  
+    return `The best year was ${avgMoviesByYear[0].year} with an average score of ${avgMoviesByYear[0].score}`
+}
